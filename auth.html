@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Login / Register – DEP-CAR SPARE PARTS</title>
+<link rel="stylesheet" href="css/style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+.auth-page{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
+.auth-left{position:relative;overflow:hidden;background:var(--dark2);}
+.auth-left img{width:100%;height:100%;object-fit:cover;opacity:.4;}
+.auth-left-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(8,12,20,.9),rgba(255,184,0,.15));display:flex;flex-direction:column;justify-content:flex-end;padding:60px;}
+.auth-left h2{font-family:'Rajdhani',sans-serif;font-size:40px;font-weight:700;margin-bottom:12px;line-height:1.1;}
+.auth-left p{color:var(--muted);font-size:15px;line-height:1.7;max-width:380px;}
+.auth-perks{margin-top:32px;display:flex;flex-direction:column;gap:12px;}
+.auth-perk{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text);}
+.auth-perk-icon{width:36px;height:36px;background:rgba(255,184,0,.15);border:1px solid rgba(255,184,0,.3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.auth-right{display:flex;align-items:center;justify-content:center;padding:80px 60px;background:var(--dark);}
+.auth-box{width:100%;max-width:420px;}
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:40px;text-decoration:none;}
+.auth-logo-icon{width:44px;height:44px;background:linear-gradient(135deg,#FFB800,#FF8C00);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;font-size:20px;font-family:'Rajdhani',sans-serif;}
+.auth-logo span{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.auth-tabs{display:flex;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:32px;}
+.auth-tab{flex:1;padding:10px;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:none;background:transparent;color:var(--muted);transition:all .3s;}
+.auth-tab.active{background:linear-gradient(135deg,var(--gold),#FF8C00);color:#000;}
+.name-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.divider span{font-size:12px;color:var(--muted);}
+.strength-bar{height:4px;border-radius:2px;background:var(--dark3);margin-top:6px;overflow:hidden;}
+.strength-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;}
+.strength-text{font-size:11px;margin-top:4px;}
+@media(max-width:768px){.auth-page{grid-template-columns:1fr;}.auth-left{display:none;}.auth-right{padding:80px 24px;}}
+</style>
+</head>
+<body>
+<div id="pageTransition" class="page-transition"></div>
+
+<div class="auth-page">
+  <!-- LEFT PANEL -->
+  <div class="auth-left">
+    <img src="images/showroom_people.png" alt="DEP-TECH Showroom"/>
+    <div class="auth-left-overlay">
+      <h2>Your Premium Parts<br/><span style="color:var(--gold);">Partner in Kenya</span></h2>
+      <p>Join thousands of vehicle owners who trust DEP-CAR SPARE PARTS for genuine OEM spare parts. Fast delivery, expert support, best prices.</p>
+      <div class="auth-perks">
+        <div class="auth-perk"><div class="auth-perk-icon">🏆</div><span>Access to 500+ premium car parts</span></div>
+        <div class="auth-perk"><div class="auth-perk-icon">📦</div><span>Track all your orders in real-time</span></div>
+        <div class="auth-perk"><div class="auth-perk-icon">💰</div><span>Exclusive member pricing and deals</span></div>
+        <div class="auth-perk"><div class="auth-perk-icon">🔧</div><span>Free technical support from experts</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="auth-right">
+    <div class="auth-box">
+      <a href="index.html" class="auth-logo" onclick="event.preventDefault();navigate('index.html')">
+        <div class="auth-logo-icon">D</div>
+        <span>DEP-CAR SPARE PARTS</span>
+      </a>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Create Account</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="loginPanel">
+        <h2 style="font-family:'Rajdhani',sans-serif;font-size:28px;margin-bottom:6px;">Welcome Back</h2>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:28px;">Sign in to view your orders and shop parts</p>
+        <div id="loginError" style="display:none;background:rgba(255,59,59,.1);border:1px solid rgba(255,59,59,.3);border-radius:10px;padding:12px 16px;font-size:14px;color:#FF6B6B;margin-bottom:16px;"></div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input id="loginEmail" type="email" class="form-input" placeholder="you@example.com"/>
+          <div class="form-error" id="loginEmailErr">Please enter a valid email</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input id="loginPass" type="password" class="form-input" placeholder="Your password"/>
+          <div class="form-error" id="loginPassErr">Password is required</div>
+        </div>
+        <button class="btn btn-gold" style="width:100%;justify-content:center;padding:14px;" onclick="doLogin()">Sign In →</button>
+        <div class="divider"><span>or</span></div>
+        <p style="text-align:center;font-size:14px;color:var(--muted);">Don't have an account? <a href="#" onclick="switchTab('register')" style="color:var(--gold);text-decoration:none;font-weight:600;">Create one free</a></p>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="registerPanel" style="display:none;">
+        <h2 style="font-family:'Rajdhani',sans-serif;font-size:28px;margin-bottom:6px;">Create Account</h2>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:28px;">Join DEP-CAR SPARE PARTS and start shopping premium parts</p>
+        <div id="regError" style="display:none;background:rgba(255,59,59,.1);border:1px solid rgba(255,59,59,.3);border-radius:10px;padding:12px 16px;font-size:14px;color:#FF6B6B;margin-bottom:16px;"></div>
+        <div class="name-row">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input id="regFirst" type="text" class="form-input" placeholder="John"/>
+            <div class="form-error" id="regFirstErr">Enter your first name</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input id="regLast" type="text" class="form-input" placeholder="Doe"/>
+            <div class="form-error" id="regLastErr">Enter your last name</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input id="regEmail" type="email" class="form-input" placeholder="you@example.com"/>
+          <div class="form-error" id="regEmailErr">Enter a valid email address</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input id="regPass" type="password" class="form-input" placeholder="Min. 6 characters" oninput="checkStrength(this.value)"/>
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill" style="width:0%;background:var(--red);"></div></div>
+          <div class="strength-text" id="strengthText" style="color:var(--muted);"></div>
+          <div class="form-error" id="regPassErr">Password must be at least 6 characters</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input id="regPass2" type="password" class="form-input" placeholder="Repeat password"/>
+          <div class="form-error" id="regPass2Err">Passwords do not match</div>
+        </div>
+        <button class="btn btn-gold" style="width:100%;justify-content:center;padding:14px;" onclick="doRegister()">Create Account →</button>
+        <div class="divider"><span>or</span></div>
+        <p style="text-align:center;font-size:14px;color:var(--muted);">Already have an account? <a href="#" onclick="switchTab('login')" style="color:var(--gold);text-decoration:none;font-weight:600;">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+// If already logged in, redirect
+if (getCurrentUser()) navigate('index.html');
+
+// Check URL hash for register
+if (window.location.hash === '#register') switchTab('register');
+
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('loginPanel').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('registerPanel').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('tabLogin').classList.toggle('active', isLogin);
+  document.getElementById('tabRegister').classList.toggle('active', !isLogin);
+}
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.classList.add('show');
+}
+function clearErr(id) { document.getElementById(id).classList.remove('show'); }
+
+function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  let ok = true;
+  clearErr('loginEmailErr'); clearErr('loginPassErr');
+  document.getElementById('loginError').style.display = 'none';
+  if (!validateEmail(email)) { showErr('loginEmailErr','Please enter a valid email'); ok = false; }
+  if (!pass) { showErr('loginPassErr','Password is required'); ok = false; }
+  if (!ok) return;
+  const result = login(email, pass);
+  if (!result.ok) {
+    const errEl = document.getElementById('loginError');
+    errEl.textContent = result.msg; errEl.style.display = 'block';
+  } else {
+    showToast('Welcome back! Redirecting...', 'success');
+    setTimeout(() => navigate('index.html'), 1000);
+  }
+}
+
+function doRegister() {
+  const first = document.getElementById('regFirst').value.trim();
+  const last = document.getElementById('regLast').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const pass2 = document.getElementById('regPass2').value;
+  let ok = true;
+  ['regFirstErr','regLastErr','regEmailErr','regPassErr','regPass2Err'].forEach(clearErr);
+  document.getElementById('regError').style.display = 'none';
+  if (!first || first.length < 2) { showErr('regFirstErr','First name must be at least 2 characters'); ok = false; }
+  if (!last || last.length < 2) { showErr('regLastErr','Last name must be at least 2 characters'); ok = false; }
+  if (!validateEmail(email)) { showErr('regEmailErr','Enter a valid email address'); ok = false; }
+  if (pass.length < 6) { showErr('regPassErr','Password must be at least 6 characters'); ok = false; }
+  if (pass !== pass2) { showErr('regPass2Err','Passwords do not match'); ok = false; }
+  if (!ok) return;
+  const result = register(first, last, email, pass);
+  if (!result.ok) {
+    const errEl = document.getElementById('regError');
+    errEl.textContent = result.msg; errEl.style.display = 'block';
+  } else {
+    showToast('Account created! Welcome to DEP-CAR SPARE PARTS!', 'success');
+    setTimeout(() => navigate('index.html'), 1200);
+  }
+}
+
+function checkStrength(val) {
+  const fill = document.getElementById('strengthFill');
+  const text = document.getElementById('strengthText');
+  let score = 0;
+  if (val.length >= 6) score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const pct = (score / 5) * 100;
+  const colors = ['#FF3B3B','#FF8C00','#FFB800','#8BC34A','#00C853'];
+  const labels = ['Very Weak','Weak','Fair','Strong','Very Strong'];
+  fill.style.width = pct + '%';
+  fill.style.background = colors[score - 1] || '#FF3B3B';
+  text.textContent = val ? labels[score - 1] || '' : '';
+  text.style.color = colors[score - 1] || 'var(--muted)';
+}
+</script>
+</body>
+</html>

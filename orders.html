@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>My Orders – DEP-CAR SPARE PARTS</title>
+<link rel="stylesheet" href="css/style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+.orders-page{padding:110px 80px 80px;min-height:100vh;}
+.orders-layout{display:grid;grid-template-columns:1fr 300px;gap:32px;align-items:start;}
+.page-title{font-family:'Rajdhani',sans-serif;font-size:40px;font-weight:700;margin-bottom:6px;}
+.page-subtitle{color:var(--muted);font-size:15px;margin-bottom:32px;}
+.empty-orders{text-align:center;padding:100px 20px;background:var(--card);border:1px solid var(--border);border-radius:20px;}
+.empty-orders .icon{font-size:72px;margin-bottom:20px;}
+.order-item-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.order-item-row:last-child{border-bottom:none;}
+.order-item-img{width:56px;height:56px;border-radius:8px;object-fit:cover;flex-shrink:0;}
+.order-item-info{flex:1;}
+.order-item-name{font-size:14px;font-weight:600;margin-bottom:2px;}
+.order-item-meta{font-size:12px;color:var(--muted);}
+.order-item-price{font-family:'Rajdhani',sans-serif;font-size:16px;color:var(--gold);font-weight:700;white-space:nowrap;}
+.order-expand{display:none;}
+.order-expand.open{display:block;animation:fadeInUp .3s ease;}
+.expand-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 14px;font-size:13px;cursor:none;transition:all .3s;font-family:'Outfit',sans-serif;}
+.expand-btn:hover{border-color:var(--gold);color:var(--gold);}
+.profile-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;position:sticky;top:90px;}
+.profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#FF8C00);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#000;font-family:'Rajdhani',sans-serif;margin-bottom:16px;}
+.profile-name{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px;}
+.profile-email{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.profile-field{margin-bottom:14px;}
+.profile-field label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px;}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.stat-mini{background:var(--dark3);border-radius:10px;padding:12px;text-align:center;}
+.stat-mini-num{font-family:'Rajdhani',sans-serif;font-size:24px;color:var(--gold);font-weight:700;}
+.stat-mini-label{font-size:11px;color:var(--muted);}
+.download-btn{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;border-radius:10px;padding:10px 18px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:none;display:flex;align-items:center;gap:8px;transition:all .3s;width:100%;justify-content:center;}
+.download-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(10,132,255,.4);}
+.order-timeline{display:flex;gap:0;margin:16px 0;}
+.tl-step{flex:1;text-align:center;position:relative;}
+.tl-step::before{content:'';position:absolute;top:12px;left:50%;right:-50%;height:2px;background:var(--border);}
+.tl-step:last-child::before{display:none;}
+.tl-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);background:var(--dark3);display:flex;align-items:center;justify-content:center;font-size:10px;margin:0 auto 6px;position:relative;z-index:1;}
+.tl-dot.done{background:var(--green);border-color:var(--green);color:#fff;}
+.tl-dot.active{background:var(--gold);border-color:var(--gold);color:#000;}
+.tl-label{font-size:10px;color:var(--muted);}
+@media(max-width:1024px){.orders-layout{grid-template-columns:1fr;}.orders-page{padding:100px 30px 60px;}.profile-card{position:static;}}
+@media(max-width:600px){.orders-page{padding:100px 16px 60px;}}
+</style>
+</head>
+<body>
+<div id="pageTransition" class="page-transition"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo" onclick="event.preventDefault();navigate('index.html')">
+    <div style="width:44px;height:44px;background:linear-gradient(135deg,#FFB800,#FF8C00);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;font-size:18px;font-family:'Rajdhani',sans-serif;">D</div>
+    <div class="nav-logo-text"><span>DEP-CAR SPARE PARTS</span><span>Premium Auto Spares</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="index.html" onclick="event.preventDefault();navigate('index.html')">Home</a>
+    <a href="shop.html" onclick="event.preventDefault();navigate('shop.html')">Shop Parts</a>
+    <a href="orders.html" class="active">My Orders</a>
+  </div>
+  <div class="nav-actions">
+    <a href="cart.html" class="cart-btn" onclick="event.preventDefault();navigate('cart.html')">🛒 Cart <span class="cart-count">0</span></a>
+    <div id="authBtns" style="display:flex;gap:8px;">
+      <a href="auth.html" class="btn btn-outline" onclick="event.preventDefault();navigate('auth.html')">Login</a>
+      <a href="auth.html" class="btn btn-gold" onclick="event.preventDefault();navigate('auth.html')">Register</a>
+    </div>
+    <div id="userMenu" style="display:none;align-items:center;gap:12px;">
+      <span id="userGreet" style="font-size:14px;color:var(--muted);"></span>
+      <button class="btn btn-outline" onclick="logout()" style="font-size:13px;padding:8px 16px;">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="orders-page">
+  <h1 class="page-title">📦 My Orders</h1>
+  <p class="page-subtitle">Track and manage all your DEP-CAR SPARE PARTS orders</p>
+  <div id="ordersContent"></div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+function renderOrders() {
+  const cu = getCurrentUser();
+  const el = document.getElementById('ordersContent');
+
+  if (!cu) {
+    el.innerHTML = `<div class="empty-orders">
+      <div class="icon">🔐</div>
+      <h3 style="font-family:'Rajdhani',sans-serif;font-size:28px;margin-bottom:8px;">Login Required</h3>
+      <p style="color:var(--muted);margin-bottom:24px;">Please login to view your order history</p>
+      <a href="auth.html" class="btn btn-gold" onclick="event.preventDefault();navigate('auth.html')">Login / Register</a>
+    </div>`;
+    return;
+  }
+
+  const orders = getUserOrders();
+  const totalSpent = orders.reduce((s,o)=>s+o.total,0);
+
+  // Profile sidebar
+  const initials = cu.firstName[0] + cu.lastName[0];
+  const profileHTML = `
+    <div class="profile-card">
+      <div class="profile-avatar">${initials}</div>
+      <div class="profile-name">${cu.firstName} ${cu.lastName}</div>
+      <div class="profile-email">${cu.email}</div>
+      <div class="stats-row">
+        <div class="stat-mini"><div class="stat-mini-num">${orders.length}</div><div class="stat-mini-label">Orders</div></div>
+        <div class="stat-mini"><div class="stat-mini-num">${orders.reduce((s,o)=>s+o.items.reduce((a,i)=>a+i.qty,0),0)}</div><div class="stat-mini-label">Parts Bought</div></div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">Total Spent: <span style="color:var(--gold);font-weight:700;">${formatKES(totalSpent)}</span></div>
+      <hr style="border-color:var(--border);margin-bottom:20px;"/>
+      <h4 style="font-size:14px;font-weight:700;margin-bottom:14px;color:var(--gold);">UPDATE PROFILE</h4>
+      <div class="profile-field">
+        <label>📍 Location</label>
+        <input id="profileLocation" class="form-input" type="text" placeholder="Your location" value="${cu.location||''}"/>
+      </div>
+      <div class="profile-field">
+        <label>📞 Phone</label>
+        <input id="profilePhone" class="form-input" type="tel" placeholder="+254..." value="${cu.phone||''}"/>
+      </div>
+      <button class="btn btn-gold" style="width:100%;justify-content:center;margin-bottom:12px;" onclick="saveProfile()">💾 Save Profile</button>
+      <button class="download-btn" onclick="downloadAllOrders()">⬇️ Download All Orders (PDF)</button>
+    </div>`;
+
+  if (!orders.length) {
+    el.innerHTML = `<div class="orders-layout">
+      <div class="empty-orders">
+        <div class="icon">📦</div>
+        <h3 style="font-family:'Rajdhani',sans-serif;font-size:28px;margin-bottom:8px;">No Orders Yet</h3>
+        <p style="color:var(--muted);margin-bottom:24px;">You haven't placed any orders yet. Start shopping!</p>
+        <a href="shop.html" class="btn btn-gold" onclick="event.preventDefault();navigate('shop.html')">Browse Parts →</a>
+      </div>
+      ${profileHTML}
+    </div>`;
+    return;
+  }
+
+  const ordersHTML = orders.map((o,idx) => {
+    const statuses = ['Processing','Confirmed','Shipped','Delivered'];
+    const statusIdx = statuses.indexOf(o.status);
+    const tlHTML = statuses.map((s,i)=>`
+      <div class="tl-step">
+        <div class="tl-dot ${i<statusIdx?'done':i===statusIdx?'active':''}">${i<statusIdx?'✓':i+1}</div>
+        <div class="tl-label">${s}</div>
+      </div>`).join('');
+
+    return `
+    <div class="order-card">
+      <div class="order-header">
+        <div>
+          <div class="order-id">${o.id}</div>
+          <div class="order-date">${new Date(o.date).toLocaleDateString('en-KE',{year:'numeric',month:'long',day:'numeric'})}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="order-status status-processing">${o.status}</span>
+          <button class="expand-btn" onclick="toggleOrder('exp_${idx}',this)"">View Items ▼</button>
+          <button class="download-btn" style="width:auto;padding:8px 14px;" onclick="downloadOrder('${o.id}')">⬇️ Download</button>
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="order-timeline">${tlHTML}</div>
+
+      <!-- SUMMARY -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;">
+        <div style="background:var(--dark3);border-radius:10px;padding:12px;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">TOTAL</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:20px;color:var(--gold);">${formatKES(o.total)}</div>
+        </div>
+        <div style="background:var(--dark3);border-radius:10px;padding:12px;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">LOCATION</div>
+          <div style="font-size:13px;font-weight:600;">📍 ${o.location||'—'}</div>
+        </div>
+        <div style="background:var(--dark3);border-radius:10px;padding:12px;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">PHONE</div>
+          <div style="font-size:13px;font-weight:600;">📞 ${o.phone||'—'}</div>
+        </div>
+      </div>
+
+      <!-- EXPANDABLE ITEMS -->
+      <div class="order-expand" id="exp_${idx}">
+        <div style="background:var(--dark3);border-radius:12px;padding:16px;margin-top:8px;">
+          <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:12px;">ORDER ITEMS (${o.items.length})</div>
+          ${o.items.map(item=>`
+            <div class="order-item-row">
+              <img class="order-item-img" src="${item.img}" alt="${item.name}" onerror="this.src='https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=100&q=80'"/>
+              <div class="order-item-info">
+                <div class="order-item-name">${item.name}</div>
+                <div class="order-item-meta">${item.carName} · ${item.category} · Qty: ${item.qty}</div>
+              </div>
+              <div class="order-item-price">${formatKES(item.price*item.qty)}</div>
+            </div>`).join('')}
+          <div style="text-align:right;padding-top:12px;border-top:1px solid var(--border);margin-top:4px;">
+            <span style="font-family:'Rajdhani',sans-serif;font-size:20px;color:var(--gold);">Total: ${formatKES(o.total)}</span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div class="orders-layout"><div>${ordersHTML}</div>${profileHTML}</div>`;
+}
+
+function toggleOrder(id, btn) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+  btn.textContent = el.classList.contains('open') ? 'Hide Items ▲' : 'View Items ▼';
+}
+
+function saveProfile() {
+  const location = document.getElementById('profileLocation').value.trim();
+  const phone = document.getElementById('profilePhone').value.trim();
+  updateProfile({ location, phone });
+  showToast('Profile updated successfully!', 'success');
+}
+
+function downloadOrder(orderId) {
+  const orders = getOrders();
+  const o = orders.find(ord=>ord.id===orderId);
+  if (!o) return;
+  generateOrderPDF([o], `DEP-TECH_Order_${orderId}.txt`);
+}
+
+function downloadAllOrders() {
+  const orders = getUserOrders();
+  if (!orders.length) { showToast('No orders to download', 'error'); return; }
+  generateOrderPDF(orders, 'DEP-TECH_All_Orders.txt');
+}
+
+function generateOrderPDF(orders, filename) {
+  let content = '==============================================\n';
+  content += '       DEP-CAR SPARE PARTS\n';
+  content += '       Industrial Area, Nairobi, Kenya\n';
+  content += '       Tel: +254 700 000 000\n';
+  content += '       info@depcar.co.ke\n';
+  content += '==============================================\n\n';
+
+  const cu = getCurrentUser();
+  if (cu) {
+    content += `Customer: ${cu.firstName} ${cu.lastName}\n`;
+    content += `Email: ${cu.email}\n`;
+    content += `Downloaded: ${new Date().toLocaleString('en-KE')}\n\n`;
+  }
+
+  orders.forEach((o,i) => {
+    content += `----------------------------------------------\n`;
+    content += `ORDER #${i+1}: ${o.id}\n`;
+    content += `Date: ${new Date(o.date).toLocaleDateString('en-KE',{year:'numeric',month:'long',day:'numeric'})}\n`;
+    content += `Status: ${o.status}\n`;
+    content += `Delivery To: ${o.location||'N/A'}\n`;
+    content += `Phone: ${o.phone||'N/A'}\n`;
+    content += `----------------------------------------------\n`;
+    content += `ITEMS:\n`;
+    o.items.forEach(item => {
+      content += `  - ${item.name}\n`;
+      content += `    Car: ${item.carName} | Category: ${item.category}\n`;
+      content += `    Qty: ${item.qty} x ${formatKES(item.price)} = ${formatKES(item.price*item.qty)}\n`;
+    });
+    content += `\nORDER TOTAL: ${formatKES(o.total)}\n\n`;
+  });
+
+  content += '==============================================\n';
+  content += 'Thank you for choosing DEP-CAR SPARE PARTS!\n';
+  content += 'Drive safe. Service excellence guaranteed.\n';
+  content += '==============================================\n';
+
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Order receipt downloaded!', 'success');
+}
+
+renderOrders();
+</script>
+</body>
+</html>

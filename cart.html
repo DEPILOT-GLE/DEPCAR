@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Cart & Checkout – DEP-CAR SPARE PARTS</title>
+<link rel="stylesheet" href="css/style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+.cart-page{padding:110px 80px 80px;min-height:100vh;}
+.cart-layout{display:grid;grid-template-columns:1fr 360px;gap:32px;align-items:start;}
+.page-title{font-family:'Rajdhani',sans-serif;font-size:40px;font-weight:700;margin-bottom:8px;}
+.page-subtitle{color:var(--muted);font-size:15px;margin-bottom:32px;}
+.empty-cart{text-align:center;padding:100px 20px;background:var(--card);border:1px solid var(--border);border-radius:20px;}
+.empty-cart .icon{font-size:80px;margin-bottom:20px;}
+.empty-cart h3{font-size:24px;font-family:'Rajdhani',sans-serif;margin-bottom:8px;}
+.empty-cart p{color:var(--muted);margin-bottom:24px;}
+.checkout-section{margin-top:24px;padding-top:24px;border-top:1px solid var(--border);}
+.checkout-section h3{font-family:'Rajdhani',sans-serif;font-size:20px;margin-bottom:20px;}
+.promo-row{display:flex;gap:8px;}
+.promo-row input{flex:1;}
+.promo-row button{white-space:nowrap;}
+.success-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+.success-overlay.show{opacity:1;pointer-events:all;}
+.success-box{background:var(--card);border:1px solid rgba(0,200,83,.4);border-radius:24px;padding:50px;text-align:center;max-width:480px;width:90%;transform:scale(.9);transition:transform .4s cubic-bezier(.175,.885,.32,1.275);}
+.success-overlay.show .success-box{transform:scale(1);}
+.success-icon{font-size:72px;margin-bottom:20px;display:block;animation:popIn .6s .3s both;}
+@keyframes popIn{from{transform:scale(0)rotate(-30deg);}to{transform:scale(1)rotate(0deg);}}
+.success-box h2{font-family:'Rajdhani',sans-serif;font-size:36px;color:var(--green);margin-bottom:8px;}
+.success-box p{color:var(--muted);margin-bottom:24px;line-height:1.7;}
+.order-id-badge{background:rgba(0,200,83,.1);border:1px solid rgba(0,200,83,.3);border-radius:10px;padding:12px 20px;font-family:'Rajdhani',sans-serif;font-size:20px;color:var(--green);margin-bottom:24px;display:inline-block;}
+@media(max-width:1024px){.cart-layout{grid-template-columns:1fr;}.cart-page{padding:100px 30px 60px;}}
+@media(max-width:600px){.cart-page{padding:100px 16px 60px;}}
+</style>
+</head>
+<body>
+<div id="pageTransition" class="page-transition"></div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <span class="success-icon">✅</span>
+    <h2>Order Placed!</h2>
+    <p>Thank you for your order. Our team will contact you shortly to confirm delivery details.</p>
+    <div class="order-id-badge" id="successOrderId">DEP-XXXXXXXX</div>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="orders.html" class="btn btn-gold" onclick="event.preventDefault();navigate('orders.html')">View My Orders</a>
+      <a href="shop.html" class="btn btn-outline" onclick="event.preventDefault();navigate('shop.html')">Continue Shopping</a>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo" onclick="event.preventDefault();navigate('index.html')">
+    <div style="width:44px;height:44px;background:linear-gradient(135deg,#FFB800,#FF8C00);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;font-size:18px;font-family:'Rajdhani',sans-serif;">D</div>
+    <div class="nav-logo-text"><span>DEP-CAR SPARE PARTS</span><span>Premium Auto Spares</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="index.html" onclick="event.preventDefault();navigate('index.html')">Home</a>
+    <a href="shop.html" onclick="event.preventDefault();navigate('shop.html')">Shop Parts</a>
+    <a href="orders.html" onclick="event.preventDefault();navigate('orders.html')">My Orders</a>
+  </div>
+  <div class="nav-actions">
+    <a href="cart.html" class="cart-btn active" onclick="event.preventDefault();">🛒 Cart <span class="cart-count">0</span></a>
+    <div id="authBtns" style="display:flex;gap:8px;">
+      <a href="auth.html" class="btn btn-outline" onclick="event.preventDefault();navigate('auth.html')">Login</a>
+      <a href="auth.html" class="btn btn-gold" onclick="event.preventDefault();navigate('auth.html')">Register</a>
+    </div>
+    <div id="userMenu" style="display:none;align-items:center;gap:12px;">
+      <span id="userGreet" style="font-size:14px;color:var(--muted);"></span>
+      <button class="btn btn-outline" onclick="logout()" style="font-size:13px;padding:8px 16px;">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="cart-page">
+  <h1 class="page-title">🛒 Shopping Cart</h1>
+  <p class="page-subtitle">Review your items and complete your order</p>
+
+  <div id="cartContent"></div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+function renderCart() {
+  const cart = getCart();
+  const cu = getCurrentUser();
+  const el = document.getElementById('cartContent');
+
+  if (!cart.length) {
+    el.innerHTML = `<div class="empty-cart">
+      <div class="icon">🛒</div>
+      <h3>Your Cart is Empty</h3>
+      <p>You haven't added any parts yet. Browse our shop to find what you need.</p>
+      <a href="shop.html" class="btn btn-gold" onclick="event.preventDefault();navigate('shop.html')">Browse Parts →</a>
+    </div>`;
+    return;
+  }
+
+  const total = getCartTotal();
+  const delivery = total > 50000 ? 0 : 3500;
+  const grandTotal = total + delivery;
+
+  el.innerHTML = `
+  <div class="cart-layout">
+    <div>
+      <div id="cartItems"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:20px;">
+        <a href="shop.html" class="btn btn-dark" onclick="event.preventDefault();navigate('shop.html')">← Continue Shopping</a>
+        <button class="btn btn-outline" onclick="clearCartConfirm()" style="color:var(--red);border-color:var(--red);">🗑 Clear Cart</button>
+      </div>
+    </div>
+    <div>
+      <div class="order-summary">
+        <h3>Order Summary</h3>
+        <div class="summary-row"><span>Subtotal (${cart.reduce((s,i)=>s+i.qty,0)} items)</span><span>${formatKES(total)}</span></div>
+        <div class="summary-row"><span>Delivery</span><span style="color:${delivery===0?'var(--green)':'var(--text)'}">${delivery===0?'FREE ✅':formatKES(delivery)}</span></div>
+        ${delivery>0?'<div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Add KSh '+formatKES(50000-total)+' more for FREE delivery</div>':''}
+        <div class="summary-row total"><span>Total</span><span>${formatKES(grandTotal)}</span></div>
+
+        <div class="checkout-section">
+          <h3>Delivery Details</h3>
+          ${!cu ? `<div style="background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.3);border-radius:10px;padding:16px;font-size:14px;margin-bottom:16px;">
+            <strong style="color:var(--gold);">⚠️ Login Required</strong><br/>
+            <span style="color:var(--muted);">Please login to complete your order.</span><br/>
+            <a href="auth.html" class="btn btn-gold" style="margin-top:12px;font-size:13px;" onclick="event.preventDefault();navigate('auth.html')">Login / Register</a>
+          </div>` : ''}
+          <div class="form-group">
+            <label class="form-label">📍 Delivery Location</label>
+            <input id="checkoutLocation" class="form-input" type="text" placeholder="e.g. Westlands, Nairobi" value="${cu?.location||''}"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">📞 Phone Number</label>
+            <input id="checkoutPhone" class="form-input" type="tel" placeholder="e.g. +254 700 000 000" value="${cu?.phone||''}"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">📝 Special Instructions (Optional)</label>
+            <input id="checkoutNotes" class="form-input" type="text" placeholder="e.g. Call before delivery"/>
+          </div>
+          <button class="btn btn-gold" style="width:100%;justify-content:center;padding:16px;font-size:16px;margin-top:8px;" onclick="doCheckout()">
+            ✅ Place Order – ${formatKES(grandTotal)}
+          </button>
+          <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:12px;">🔒 Secure checkout · M-Pesa & Bank Transfer accepted</p>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  // Render cart items
+  document.getElementById('cartItems').innerHTML = cart.map(item => `
+    <div class="cart-item" id="cartItem_${item.id}">
+      <img class="cart-item-img" src="${item.img}" alt="${item.name}" onerror="this.src='https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=200&q=80'"/>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-car">${item.carName} · ${item.category}</div>
+        <div class="cart-item-price" style="margin-top:6px;">${formatKES(item.price * item.qty)}</div>
+        <div style="font-size:12px;color:var(--muted);">${formatKES(item.price)} each</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px;">
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
+        </div>
+        <button class="remove-btn" onclick="removeItem(${item.id})" title="Remove">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function changeQty(id, delta) { updateQty(id, delta); renderCart(); }
+function removeItem(id) { removeFromCart(id); renderCart(); showToast('Item removed from cart', 'info'); }
+function clearCartConfirm() {
+  if (confirm('Remove all items from cart?')) { saveCart([]); renderCart(); }
+}
+
+function doCheckout() {
+  const cu = getCurrentUser();
+  if (!cu) { showToast('Please login to place an order', 'error'); setTimeout(()=>navigate('auth.html'),1200); return; }
+  const location = document.getElementById('checkoutLocation').value.trim();
+  const phone = document.getElementById('checkoutPhone').value.trim();
+  if (!location) { showToast('Please enter your delivery location', 'error'); return; }
+  if (!phone) { showToast('Please enter your phone number', 'error'); return; }
+  // Save profile updates
+  updateProfile({ location, phone });
+  const order = placeOrder(location, phone);
+  if (order) {
+    document.getElementById('successOrderId').textContent = order.id;
+    document.getElementById('successOverlay').classList.add('show');
+  }
+}
+
+renderCart();
+</script>
+</body>
+</html>
